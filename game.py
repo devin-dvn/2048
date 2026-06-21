@@ -1,6 +1,6 @@
 import pygame
 import random
-from utils import generage_number, pull_board_line
+from utils import generage_number, pull_board_line, evaluate, UIManager
 
 NROW = 4
 NCOL = 4
@@ -57,6 +57,8 @@ is_key_down_down = False
 
 game_state = "intro"
 
+ui_manager = UIManager(screen, font_small, (WIN_WIDTH, WIN_HEIGHT), game_state)
+
 while is_running:
     for event in pygame.event.get():
         # print(event)
@@ -110,14 +112,18 @@ while is_running:
         else:
             game_state = 'player_choice'
             
-        # game_state = 'wait'
-                    
-    elif game_state == 'wait':
-        pass
+        board_state = evaluate(board)
+        if board_state == "lose":
+            game_state = "end"
+            ui_manager.set_state_msg(board_state)
+       
                         
     elif game_state == 'generate_number':
         generage_number(board)
         game_state = 'player_choice'
+        
+    elif game_state == "end":
+        pass
     
         
         
@@ -146,9 +152,9 @@ while is_running:
                 center_y = tile_y + (CELL_SIZE - text_h) // 2
                 screen.blit(text, (center_x, center_y))
                 
-    text_content = f"game_state: {game_state}"
-    text = font_small.render(text_content, True, (255, 255, 255))
-    screen.blit(text, (10, WIN_HEIGHT - 20))
+    ui_manager.draw()
+                
+    
     
             
     pygame.display.flip()

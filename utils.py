@@ -32,7 +32,14 @@ def generage_number(board: [[int]]):
     if len(empty_cell_pos_list) > 0:
         i, j = random.choice(empty_cell_pos_list)
         # number = 2 ** random.randint(1, EXPONENT_MAX)
-        number = random.randint(1, EXPONENT_MAX - 1)
+        
+        max_num = 1
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] != None and board[i][j] > max_num:
+                    max_num = board[i][j]
+        # number = random.randint(1, EXPONENT_MAX - 1)
+        number = random.randint(1, max_num)
         board[i][j] = number
         print(f"[generage_number()] (i, j): {i, j} / number: {number}")
         
@@ -95,3 +102,46 @@ def pull_board_line(board, direction):
                 board[i][k] = _line[i]
                 
     pprint(board)
+    
+    
+def evaluate(board):
+    final_number = EXPONENT_MAX
+    cnt_none = 0
+    cnt_final = 0
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == None:
+                cnt_none += 1
+            elif board[i][j] == final_number:
+                cnt_final += 1
+    
+    if cnt_none == 0:
+        return "lose"
+    elif cnt_final >= 1:
+        return "win"
+    
+class UIManager:
+    def __init__(self, screen, font, win_size, game_state):
+        self.screen = screen
+        self.font = font
+        self.font_small = font
+        self.WIN_WIDTH = win_size[0]
+        self.WIN_HEIGHT = win_size[1]
+        self.state_msg = "----"
+        self.game_state = game_state
+        
+    def set_state_msg(self, text):
+        self.state_msg = text
+    
+    def _show_state_msg(self):
+        text_content = f"{self.state_msg}"
+        text = self.font.render(text_content, True, (255, 255, 255))
+        self.screen.blit(text, (10, self.WIN_HEIGHT - 30))
+        
+    def draw(self):
+        text_content = f"game_state: {self.game_state}"
+        text = self.font_small.render(text_content, True, (255, 255, 255))
+        self.screen.blit(text, (10, self.WIN_HEIGHT - 50))
+        
+        self._show_state_msg()
+        
